@@ -1,1 +1,5 @@
-# watta-draw-be
+# Watta Draw Backend
+
+Get creative and drawing prompts.
+
+Enjoy!
