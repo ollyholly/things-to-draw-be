@@ -1,0 +1,4 @@
+pretty
+fast
+hungry
+lazy

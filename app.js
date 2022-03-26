@@ -1,16 +1,31 @@
-const words = {
-  adjectives: ['good', 'bad', 'random', 'red', 'flying',
-  ],
-  nouns: ['cat', 'dog', 'bird', 'banana'],
-  verbs: ['running', 'eating', 'jumping', 'laughing'],
+const fs = require('fs');
+
+const readWordsFromFile = async (key) => {
+  const path = `./src/text/${key}.txt`;
+
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf8', (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      const lines = data.split(/\r?\n/);
+      resolve(lines);
+    });
+  });
 };
 
-const genRandomWord = (key) => {
-  const array = words[key];
+const genRandomWord = async (key) => {
+  const words = await readWordsFromFile(key);
 
-  const randomWord = array[Math.floor(Math.random() * array.length)];
+  const randomWord = words[Math.floor(Math.random() * words.length)];
 
   return randomWord;
 };
 
-console.log(`${genRandomWord('adjectives')} ${genRandomWord('nouns')} ${genRandomWord('verbs')}`);
+(async () => {
+  try {
+    console.log(`${await genRandomWord('adjectives')} ${await genRandomWord('nouns')} ${await genRandomWord('verbs')}`);
+  } catch (e) {
+    console.error(e);
+  }
+})();
