@@ -2,7 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 
-const { createWord, getWords } = require('../src/mongo');
+const { getWords } = require('../src/mongo');
+const { createWord } = require('../src/mongoose');
 
 const DUMMY_WORDS = [
   {
