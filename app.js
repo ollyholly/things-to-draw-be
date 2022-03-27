@@ -7,8 +7,8 @@ const packsRoutes = require('./routes/packs-routes');
 
 const app = express();
 
-app.use(wordsRoutes);
-app.use(categoriesRoutes);
-app.use(packsRoutes);
+app.use('/api/words', wordsRoutes);
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/packs', packsRoutes);
 
 app.listen(4000);

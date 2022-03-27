@@ -2,14 +2,48 @@ const express = require('express');
 
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
+const DUMMY_WORDS = [
+  {
+    id: 'w1',
+    text: 'dog',
+    type: 'noun',
+    category: [
+      'animal',
+      'main',
+    ],
+    pack: ['easy'],
+  },
+  {
+    id: 'w2',
+    text: 'cat',
+    type: 'noun',
+    category: [
+      'animal',
+      'main',
+    ],
+    pack: ['easy'],
+  },
+  {
+    id: 'w3',
+    text: 'bird',
+    type: 'noun',
+    category: [
+      'animal',
+      'main',
+    ],
+    pack: ['easy'],
+  },
+];
+
+router.get('/', (req, res) => {
   console.log('GET request in Words');
-  res.json({ message: 'it works!' });
+  res.json(DUMMY_WORDS);
 });
 
-router.get('/words', (req, res, next) => {
-  console.log('GET request in Words');
-  res.json({ message: 'it works in words!' });
+router.get('/:wid', (req, res) => {
+  const wordId = req.params.wid;
+  const word = DUMMY_WORDS.find((w) => w.id === wordId);
+  res.json(word);
 });
 
 module.exports = router;
