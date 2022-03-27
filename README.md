@@ -1,4 +1,4 @@
-# Watta Draw Backend
+# Drawing Games Backend
 
 Get creative and drawing prompts.
 
