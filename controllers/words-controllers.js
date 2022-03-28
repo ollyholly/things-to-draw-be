@@ -16,6 +16,23 @@ const getWords = async (req, res, next) => {
   res.json({ words });
 };
 
+const getRandomWord = async (req, res, next) => {
+  let word;
+  try {
+    const count = await Word.count();
+    const random = Math.floor(Math.random() * count);
+    word = await Word.findOne().skip(random);
+  } catch (err) {
+    const error = new HttpError(
+      'Something went wrong, could not get words.',
+      500,
+    );
+    return next(error);
+  }
+
+  res.json({ randomWord: word });
+};
+
 const createWord = async (req, res, next) => {
   const {
     text, partOfSpeech, category, pack,
@@ -46,4 +63,5 @@ const createWord = async (req, res, next) => {
 module.exports = {
   createWord,
   getWords,
+  getRandomWord,
 };
