@@ -12,7 +12,7 @@ const createWord = async (req, res) => {
   const newWord = new Word(
     {
       text: req.body.text,
-      type: req.body.type,
+      partOfSpeech: req.body.partOfSpeech,
       category: req.body.category,
       pack: req.body.pack,
     },

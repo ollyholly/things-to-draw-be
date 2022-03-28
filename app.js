@@ -12,4 +12,4 @@ app.use('/api/words', wordsRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/packs', packsRoutes);
 
-app.listen(4000);
+app.listen(3000);
