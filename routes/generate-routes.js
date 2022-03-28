@@ -2,9 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
-  console.log('GET request in Generate');
-  res.json({ message: 'it works for generate!' });
-});
+const { getRandomPrompt } = require('../controllers/generate-controllers');
+
+router.get('/prompt', getRandomPrompt);
 
 module.exports = router;

@@ -6,6 +6,7 @@ require('dotenv').config();
 const wordsRoutes = require('./routes/words-routes');
 const categoriesRoutes = require('./routes/categories-routes');
 const packsRoutes = require('./routes/packs-routes');
+const generateRoutes = require('./routes/generate-routes');
 const HttpError = require('./models/http-error');
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(bodyParser.json());
 app.use('/api/words', wordsRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/packs', packsRoutes);
+app.use('/api/generate', generateRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError('Could not find this route.', 404);
