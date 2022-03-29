@@ -34,7 +34,7 @@ app.use((error, req, res, next) => {
 mongoose
   .mongoose.connect(process.env.DB_CONNECTION)
   .then(() => {
-    console.log('Connected!');
+    console.log('Connected like OMG!');
     app.listen(3000);
   })
   .catch((err) => {

@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  drawing-games-be:
+    container_name: drawing-games-be
+    build: ./
+    command: npm run start
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3000:3000'
