@@ -32,9 +32,10 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
+  .mongoose.connect(URL)
   .mongoose.connect(process.env.DB_CONNECTION)
   .then(() => {
-    console.log('Connected like OMG!');
+    console.log('Connected like OMG hey!');
     app.listen(3000);
   })
   .catch((err) => {
