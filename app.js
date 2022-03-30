@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -11,6 +12,8 @@ const HttpError = require('./models/http-error');
 
 const app = express();
 
+// if (cors) { console.log('COOORS!'); }
+app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/words', wordsRoutes);
@@ -32,10 +35,9 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .mongoose.connect(URL)
   .mongoose.connect(process.env.DB_CONNECTION)
   .then(() => {
-    console.log('Connected like OMG hey!');
+    console.log('Connected like a boss!');
     app.listen(3000);
   })
   .catch((err) => {
