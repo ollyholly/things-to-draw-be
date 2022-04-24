@@ -8,9 +8,9 @@ const {
 
 router.get('/', getWords);
 
-router.get('/:wid', getWordById);
-
 router.get('/random', getRandomWord);
+
+router.get('/:wid', getWordById);
 
 router.post('/', createWord);
 

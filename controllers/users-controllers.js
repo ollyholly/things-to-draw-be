@@ -51,7 +51,7 @@ const signup = async (req, res, next) => {
   }
 
   const {
-    name, email, password, prompts,
+    name, email, password,
   } = req.body;
 
   let existingUser;
@@ -73,7 +73,7 @@ const signup = async (req, res, next) => {
 
   const createdUser = new User(
     {
-      name, email, password, prompts,
+      name, email, password, prompts: [],
     },
   );
 

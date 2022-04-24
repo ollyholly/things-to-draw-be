@@ -1,13 +1,15 @@
+const mongoose = require('mongoose');
 const HttpError = require('../models/http-error');
 const Prompt = require('../models/prompt');
 const Word = require('../models/word');
+const User = require('../models/user');
 
 const getRandomWord = async (partOfSpeech) => {
   let word;
   try {
-    const count = await Word.find({ partOfSpeech }).count();
+    const count = await Word.find({ part_of_speech: partOfSpeech }).count();
     const random = Math.floor(Math.random() * count);
-    word = await Word.findOne({ partOfSpeech }).skip(random);
+    word = await Word.findOne({ part_of_speech: partOfSpeech }).skip(random);
   } catch (err) {
     throw new HttpError(
       'Something went wrong, could not get words.',
@@ -77,38 +79,61 @@ const generateRandomPrompt = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({ randomPrompt: prompt });
+  res.json({ prompt });
 };
 
-// const createPrompt = async (req, res, next) => {{
-//   const {
-//     text, gameMode, user
-//   } = req.body;
+const createPrompt = async (req, res, next) => {
+  const {
+    text, game_mode, user_id,
+  } = req.body;
 
-//   const createdUser = new User(
-//     {
-//       text,
-//       partOfSpeech,
-//       category,
-//       pack,
-//     },
-//   );
+  const createdPrompt = new Prompt(
+    {
+      text,
+      game_mode,
+      user_id,
+      created_at: new Date(),
+    },
+  );
 
-//   try {
-//     await createdUser.save();
-//   } catch (err) {
-//     const error = new HttpError(
-//       'Creating user failed, please try again.',
-//       500,
-//     );
-//     return next(error);
-//   }
+  let user;
 
-//   res.status(201).json({ user: createdUser });
-// };
+  try {
+    user = await User.findOne({ _id: user_id });
+  } catch (err) {
+    const error = new HttpError(
+      'Couldnt find the user with this id. Creating prompt failed, please try again.',
+      500,
+    );
+    return next(error);
+  }
+
+  if (!user) {
+    const error = new HttpError('Could not find user for the provided id.', 404);
+    return next(error);
+  }
+
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createdPrompt.save({ session: sess });
+    user.prompts.push(createdPrompt);
+    await user.save({ session: sess });
+    await sess.commitTransaction();
+  } catch (err) {
+    const error = new HttpError(
+      'Creating prompt failed, please try again.',
+      500,
+    );
+    return next(error);
+  }
+
+  res.status(201).json({ prompt: createdPrompt });
+};
 
 module.exports = {
   generateRandomPrompt,
   getPrompts,
   getPromptById,
+  createPrompt,
 };
