@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  drawing-games-be:
-    container_name: drawing-games-be
+  things-to-draw-be:
+    container_name: things-to-draw-be
     build: ./
     command: npm run start
     working_dir: /usr/src/app

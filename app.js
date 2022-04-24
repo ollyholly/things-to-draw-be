@@ -37,8 +37,8 @@ app.use((error, req, res, next) => {
 mongoose
   .mongoose.connect(process.env.DB_CONNECTION)
   .then(() => {
-    console.log('Connected like a boss!');
-    app.listen(3000);
+    console.log('Connected like a silly boss hahaha!');
+    app.listen(process.env.PORT || 3000);
   })
   .catch((err) => {
     console.log(err);
