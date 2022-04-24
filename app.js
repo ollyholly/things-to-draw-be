@@ -5,9 +5,10 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const wordsRoutes = require('./routes/words-routes');
+const usersRoutes = require('./routes/users-routes');
 const categoriesRoutes = require('./routes/categories-routes');
 const packsRoutes = require('./routes/packs-routes');
-const generateRoutes = require('./routes/generate-routes');
+const promptRoutes = require('./routes/prompt-routes');
 const HttpError = require('./models/http-error');
 
 const app = express();
@@ -17,9 +18,10 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/words', wordsRoutes);
+app.use('/api/users', usersRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/packs', packsRoutes);
-app.use('/api/generate', generateRoutes);
+app.use('/api/prompts', promptRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError('Could not find this route.', 404);
