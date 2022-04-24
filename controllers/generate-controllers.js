@@ -16,13 +16,18 @@ const getRandomWord = async (partOfSpeech) => {
   return word;
 };
 
+// Add request parameters for prompt structure
+// either enum or array with POS
 const getRandomPrompt = async (req, res, next) => {
   let prompt;
   try {
+    // Refactor this to iterate over array of params
+    // promise all
     const noun = await getRandomWord('noun');
     const adjective = await getRandomWord('adjective');
     const verb = await getRandomWord('verb');
 
+    // return an object
     prompt = `${adjective.text} ${noun.text} ${verb.text}s`;
   } catch (err) {
     const error = new HttpError(

@@ -16,6 +16,30 @@ const getWords = async (req, res, next) => {
   res.json({ words });
 };
 
+const getWordById = async (req, res, next) => {
+  const wordId = req.params.wid;
+
+  let word;
+
+  try {
+    word = await Word.findById(wordId);
+  } catch (err) {
+    const error = new HttpError(
+      'Something went wrong, could not get words.',
+      500,
+    );
+    return next(error);
+  }
+
+  if (!word) {
+    const error = new HttpError(`Could not find word for the id ${wordId}`, 404);
+
+    return next(error);
+  }
+
+  res.json({ word });
+};
+
 const getRandomWord = async (req, res, next) => {
   let word;
   const { partOfSpeech } = req.query;
@@ -65,4 +89,5 @@ module.exports = {
   createWord,
   getWords,
   getRandomWord,
+  getWordById,
 };
