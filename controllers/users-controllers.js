@@ -1,5 +1,7 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
 
@@ -15,7 +17,6 @@ const getUsers = async (req, res, next) => {
     return next(error);
   }
 
-  // res.json({ users });
   res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
@@ -86,7 +87,7 @@ const signup = async (req, res, next) => {
 
   const createdUser = new User(
     {
-      name, email, hashedPassword, prompts: [],
+      name, email, password: hashedPassword, prompts: [],
     },
   );
 
@@ -94,13 +95,25 @@ const signup = async (req, res, next) => {
     await createdUser.save();
   } catch (err) {
     const error = new HttpError(
-      'Signing up failed, please try again.',
+      '01 Signing up failed, please try again.',
       500,
     );
     return next(error);
   }
 
-  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+  let token;
+
+  try {
+    token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, 'super_secret_lala', { expiresIn: '1h' });
+  } catch (err) {
+    const error = new HttpError(
+      '02 Signing up failed, please try again.',
+      500,
+    );
+    return next(error);
+  }
+
+  res.status(201).json({ user_id: createdUser.id, email: createdUser.email, token });
 };
 
 const login = async (req, res, next) => {
@@ -142,9 +155,20 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({
-    message: 'Logged in!',
-    user: existingUser.toObject({ getters: true }),
+  let token;
+
+  try {
+    token = jwt.sign({ userId: existingUser.id, email: existingUser.email }, 'super_secret_lala', { expiresIn: '1h' });
+  } catch (err) {
+    const error = new HttpError(
+      'Logging in failed, please try again.',
+      500,
+    );
+    return next(error);
+  }
+
+  res.status(201).json({
+    userId: existingUser.id, email: existingUser.email, token, message: 'Logged in!',
   });
 };
 
