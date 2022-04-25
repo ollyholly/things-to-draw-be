@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
 
+const { JWT_SECRET } = process.env;
+
 const getUsers = async (req, res, next) => {
   let users;
   try {
@@ -104,7 +106,7 @@ const signup = async (req, res, next) => {
   let token;
 
   try {
-    token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, 'super_secret_lala', { expiresIn: '1h' });
+    token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, JWT_SECRET, { expiresIn: '1h' });
   } catch (err) {
     const error = new HttpError(
       '02 Signing up failed, please try again.',
@@ -158,7 +160,7 @@ const login = async (req, res, next) => {
   let token;
 
   try {
-    token = jwt.sign({ userId: existingUser.id, email: existingUser.email }, 'super_secret_lala', { expiresIn: '1h' });
+    token = jwt.sign({ userId: existingUser.id, email: existingUser.email }, JWT_SECRET, { expiresIn: '1h' });
   } catch (err) {
     const error = new HttpError(
       'Logging in failed, please try again.',

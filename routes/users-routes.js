@@ -1,6 +1,6 @@
 const { check } = require('express-validator');
-
 const express = require('express');
+const checkAuth = require('../middleware/check-auth');
 
 const router = express.Router();
 
@@ -11,6 +11,8 @@ const {
 router.get('/', getUsers);
 
 router.get('/:uid', getUserById);
+
+router.use(checkAuth);
 
 router.post(
   '/signup',
