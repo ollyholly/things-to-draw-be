@@ -62,12 +62,18 @@ const getPromptById = async (req, res, next) => {
 // either enum or array with POS
 const generateRandomPrompt = async (req, res, next) => {
   let prompt;
+  let noun;
+  let adjective;
+  let verb;
+
+  console.log(req.query);
+
   try {
     // Refactor this to iterate over array of params
     // promise all
-    const noun = await getRandomWord('noun');
-    const adjective = await getRandomWord('adjective');
-    const verb = await getRandomWord('verb');
+    noun = await getRandomWord('noun');
+    adjective = await getRandomWord('adjective');
+    verb = await getRandomWord('verb');
 
     // return an object
     prompt = `${adjective.text} ${noun.text} ${verb.text}s`;
@@ -79,7 +85,14 @@ const generateRandomPrompt = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({ prompt });
+  const result = {
+    prompt,
+    noun: noun.text,
+    adjective: adjective.text,
+    verb: verb.text,
+  };
+
+  res.json(result);
 };
 
 const createPrompt = async (req, res, next) => {
