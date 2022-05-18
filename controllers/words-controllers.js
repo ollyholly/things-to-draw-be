@@ -84,9 +84,64 @@ const createWord = async (req, res, next) => {
   res.status(201).json({ word: createdWord });
 };
 
+const createWordDb = async (
+  text,
+  partOfSpeech,
+  wordPacks,
+) => {
+  console.log('started creating a word');
+  const createdWord = new Word(
+    {
+      text,
+      part_of_speech: partOfSpeech,
+      word_packs: wordPacks,
+    },
+  );
+
+  console.log('new word to be', createdWord);
+
+  try {
+    await createdWord.save();
+  } catch (err) {
+    const error = new HttpError(
+      'Creating word failed, please try again.',
+      500,
+    );
+    console.log(error);
+    return error;
+  }
+
+  return createdWord;
+};
+
+const createWords = async (req, res) => {
+  const {
+    word_list, part_of_speech, word_packs,
+  } = req.body;
+
+  const promiseArray = [];
+
+  for (let i = 0; i < word_list.length; i += 1) {
+    const word = createWordDb(word_list[i], part_of_speech, word_packs)
+      .catch((e) => console.log(e.response));
+
+    promiseArray.push(word);
+  }
+
+  let createdWords = [];
+
+  await Promise.all(promiseArray)
+    .then((items) => {
+      createdWords = [...createdWords, ...items];
+    });
+
+  res.status(201).json({ words: createdWords });
+};
+
 module.exports = {
   createWord,
   getWords,
   getRandomWord,
   getWordById,
+  createWords,
 };
