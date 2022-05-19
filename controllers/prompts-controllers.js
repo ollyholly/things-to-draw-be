@@ -5,9 +5,10 @@ const Word = require('../models/word');
 const User = require('../models/user');
 const { recipes } = require('../data/constants');
 
-const getRandomWord = async ({ part_of_speech, word_packs }) => {
+const getRandomWord = async ({ tags }) => {
   let word;
-  const query = { part_of_speech, word_packs: { $all: word_packs } };
+  const query = { tags: { $all: tags } };
+  console.log(query);
   try {
     const count = await Word.find(query).count();
     const random = Math.floor(Math.random() * count);
@@ -53,7 +54,6 @@ const getPromptById = async (req, res, next) => {
 
   if (!prompt) {
     const error = new HttpError(`Could not find Prompt for the id ${promptId}`, 404);
-
     return next(error);
   }
 
@@ -61,41 +61,40 @@ const getPromptById = async (req, res, next) => {
 };
 
 const generateRandomPrompt = async (req, res, next) => {
-  let prompt;
-  // let noun;
-  // let adjective;
-  // let verb;
-
   const { gameMode, wordPack } = req.query;
 
-  const promptRecipe = recipes[gameMode];
+  let promptItems;
+  let prompt;
+
+  const promptRecipe = recipes[gameMode].request;
+  const recipeKeys = Object.keys(promptRecipe);
 
   try {
     const promiseArray = [];
 
-    for (let i = 0; i < promptRecipe.length; i += 1) {
-      const newR = {
-        ...promptRecipe[i],
-        word_packs: promptRecipe[i].word_packs
-          ? [...promptRecipe[i].word_packs, wordPack]
-          : [wordPack],
-      };
-      const promptElement = getRandomWord(newR)
+    for (let i = 0; i < recipeKeys.length; i += 1) {
+      const query = wordPack && promptRecipe[recipeKeys[i]].custamisable
+        ? [...promptRecipe[recipeKeys[i]].tags, wordPack]
+        : promptRecipe[recipeKeys[i]].tags;
+
+      // console.log(query);
+      const promptElement = getRandomWord({ tags: query })
         .catch((e) => console.log(e.response));
 
       promiseArray.push(promptElement);
+      // promiseArray.push({ word: promptElement, key: recipeKeys[i] });
     }
-
-    let promptArray = [];
 
     await Promise.all(promiseArray)
       .then((items) => {
-        promptArray = [...promptArray, ...items];
+        // console.log(items);
+        promptItems = items.reduce((acc, item, index) => {
+          acc[recipeKeys[index]] = item.text;
+          return acc;
+        }, {});
       });
 
-    // return an object
-    prompt = promptArray;
-    // prompt = `${adjective.text} ${noun.text} ${verb.text}s`;
+    prompt = recipes[gameMode].formPrompt(promptItems);
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not get words.',
@@ -106,9 +105,7 @@ const generateRandomPrompt = async (req, res, next) => {
 
   const result = {
     prompt,
-    // noun: noun.text,
-    // adjective: adjective.text,
-    // verb: verb.text,
+    ...promptItems,
   };
 
   res.json(result);

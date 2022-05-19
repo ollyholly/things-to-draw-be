@@ -42,8 +42,8 @@ const getWordById = async (req, res, next) => {
 
 const getRandomWord = async (req, res, next) => {
   let word;
-  const { part_of_speech } = req.query;
-  const query = { part_of_speech, word_packs: { $all: ['hard'] } };
+  const { tags } = req.body;
+  const query = { tags: { $all: tags } };
   try {
     const count = await Word.find(query).count();
     const random = Math.floor(Math.random() * count);
@@ -87,15 +87,13 @@ const createWord = async (req, res, next) => {
 
 const createWordDb = async (
   text,
-  partOfSpeech,
-  wordPacks,
+  tags,
 ) => {
   console.log('started creating a word');
   const createdWord = new Word(
     {
       text,
-      part_of_speech: partOfSpeech,
-      word_packs: wordPacks,
+      tags,
     },
   );
 
@@ -117,13 +115,13 @@ const createWordDb = async (
 
 const createWords = async (req, res) => {
   const {
-    word_list, part_of_speech, word_packs,
+    word_list, tags,
   } = req.body;
 
   const promiseArray = [];
 
   for (let i = 0; i < word_list.length; i += 1) {
-    const word = createWordDb(word_list[i], part_of_speech, word_packs)
+    const word = createWordDb(word_list[i], tags)
       .catch((e) => console.log(e.response));
 
     promiseArray.push(word);
