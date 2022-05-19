@@ -43,10 +43,11 @@ const getWordById = async (req, res, next) => {
 const getRandomWord = async (req, res, next) => {
   let word;
   const { part_of_speech } = req.query;
+  const query = { part_of_speech, word_packs: { $all: ['hard'] } };
   try {
-    const count = await Word.find({ part_of_speech }).count();
+    const count = await Word.find(query).count();
     const random = Math.floor(Math.random() * count);
-    word = await Word.findOne({ part_of_speech }).skip(random);
+    word = await Word.findOne(query).skip(random);
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not get words.',
@@ -60,14 +61,14 @@ const getRandomWord = async (req, res, next) => {
 
 const createWord = async (req, res, next) => {
   const {
-    text, part_of_speech, categories,
+    text, part_of_speech, word_packs,
   } = req.body;
 
   const createdWord = new Word(
     {
       text,
       part_of_speech,
-      categories,
+      word_packs,
     },
   );
 

@@ -3,13 +3,15 @@ const HttpError = require('../models/http-error');
 const Prompt = require('../models/prompt');
 const Word = require('../models/word');
 const User = require('../models/user');
+const { recipes } = require('../data/constants');
 
-const getRandomWord = async (partOfSpeech) => {
+const getRandomWord = async ({ part_of_speech, word_packs }) => {
   let word;
+  const query = { part_of_speech, word_packs: { $all: word_packs } };
   try {
-    const count = await Word.find({ part_of_speech: partOfSpeech }).count();
+    const count = await Word.find(query).count();
     const random = Math.floor(Math.random() * count);
-    word = await Word.findOne({ part_of_speech: partOfSpeech }).skip(random);
+    word = await Word.findOne(query).skip(random);
   } catch (err) {
     throw new HttpError(
       'Something went wrong, could not get words.',
@@ -58,25 +60,42 @@ const getPromptById = async (req, res, next) => {
   res.json({ prompt });
 };
 
-// Add request parameters for prompt structure
-// either enum or array with POS
 const generateRandomPrompt = async (req, res, next) => {
   let prompt;
-  let noun;
-  let adjective;
-  let verb;
+  // let noun;
+  // let adjective;
+  // let verb;
 
-  console.log(req.query);
+  const { gameMode, wordPack } = req.query;
+
+  const promptRecipe = recipes[gameMode];
 
   try {
-    // Refactor this to iterate over array of params
-    // promise all
-    noun = await getRandomWord('noun');
-    adjective = await getRandomWord('adjective');
-    verb = await getRandomWord('verb');
+    const promiseArray = [];
+
+    for (let i = 0; i < promptRecipe.length; i += 1) {
+      const newR = {
+        ...promptRecipe[i],
+        word_packs: promptRecipe[i].word_packs
+          ? [...promptRecipe[i].word_packs, wordPack]
+          : [wordPack],
+      };
+      const promptElement = getRandomWord(newR)
+        .catch((e) => console.log(e.response));
+
+      promiseArray.push(promptElement);
+    }
+
+    let promptArray = [];
+
+    await Promise.all(promiseArray)
+      .then((items) => {
+        promptArray = [...promptArray, ...items];
+      });
 
     // return an object
-    prompt = `${adjective.text} ${noun.text} ${verb.text}s`;
+    prompt = promptArray;
+    // prompt = `${adjective.text} ${noun.text} ${verb.text}s`;
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not get words.',
@@ -87,9 +106,9 @@ const generateRandomPrompt = async (req, res, next) => {
 
   const result = {
     prompt,
-    noun: noun.text,
-    adjective: adjective.text,
-    verb: verb.text,
+    // noun: noun.text,
+    // adjective: adjective.text,
+    // verb: verb.text,
   };
 
   res.json(result);
