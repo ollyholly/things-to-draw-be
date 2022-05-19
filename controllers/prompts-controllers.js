@@ -8,7 +8,6 @@ const { recipes } = require('../data/constants');
 const getRandomWord = async ({ tags }) => {
   let word;
   const query = { tags: { $all: tags } };
-  console.log(query);
   try {
     const count = await Word.find(query).count();
     const random = Math.floor(Math.random() * count);
@@ -77,17 +76,14 @@ const generateRandomPrompt = async (req, res, next) => {
         ? [...promptRecipe[recipeKeys[i]].tags, wordPack]
         : promptRecipe[recipeKeys[i]].tags;
 
-      // console.log(query);
       const promptElement = getRandomWord({ tags: query })
         .catch((e) => console.log(e.response));
 
       promiseArray.push(promptElement);
-      // promiseArray.push({ word: promptElement, key: recipeKeys[i] });
     }
 
     await Promise.all(promiseArray)
       .then((items) => {
-        // console.log(items);
         promptItems = items.reduce((acc, item, index) => {
           acc[recipeKeys[index]] = item.text;
           return acc;

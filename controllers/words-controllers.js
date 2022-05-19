@@ -89,15 +89,12 @@ const createWordDb = async (
   text,
   tags,
 ) => {
-  console.log('started creating a word');
   const createdWord = new Word(
     {
       text,
       tags,
     },
   );
-
-  console.log('new word to be', createdWord);
 
   try {
     await createdWord.save();
@@ -106,7 +103,6 @@ const createWordDb = async (
       'Creating word failed, please try again.',
       500,
     );
-    console.log(error);
     return error;
   }
 

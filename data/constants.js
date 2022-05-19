@@ -1,4 +1,18 @@
-const wordPacks = ['easy', 'hard', 'animals', 'fictional characters', 'people', 'emotions', 'characters', 'nouns', 'adjectives', 'verbs'];
+const tags = [
+  'easy',
+  'hard',
+  'animals',
+  'fictional characters',
+  'people',
+  'emotions',
+  'characters',
+  'nouns',
+  'adjectives',
+  'verbs',
+  'styles',
+  'objects',
+  'colors',
+];
 
 const recipes = {
   'Adjective Noun Verb': {
@@ -10,16 +24,13 @@ const recipes = {
       },
     formPrompt: ({ adjective, noun, verb }) => `${adjective} ${noun} ${verb}s`,
   },
-  'Character + Environment': [
-    {
-      part_of_speech: 'noun',
-      word_packs: [],
-    },
-    {
-      word_packs: ['environment'],
-    },
-  ],
-  'Single word': [],
+  'Single word': {
+    request:
+      {
+        word: { tags: [], custamisable: true },
+      },
+    formPrompt: ({ word }) => `${word}`,
+  },
   'Emotion Character': {
     request:
       {
@@ -37,9 +48,18 @@ const recipes = {
       },
     formPrompt: ({ characterOne, characterTwo, action }) => `${characterOne} and ${characterTwo} ${action}`,
   },
+  'In style': {
+    request:
+      {
+        adjective: { tags: ['adjectives'] },
+        noun: { tags: ['nouns'] },
+        style: { tags: ['styles'], custamisable: true },
+      },
+    formPrompt: ({ adjective, noun, style }) => `${adjective} ${noun} in ${style} style`,
+  },
 };
 
 module.exports = {
-  wordPacks,
+  tags,
   recipes,
 };
