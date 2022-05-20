@@ -31,7 +31,7 @@ const recipes = {
       },
     formPrompt: ({ word }) => `${word}`,
   },
-  'Emotion Character': {
+  'Emotional character': {
     request:
       {
         emotion: { tags: ['emotions'] },

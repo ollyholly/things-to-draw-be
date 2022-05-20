@@ -7,7 +7,7 @@ const { recipes } = require('../data/constants');
 
 const getRandomWord = async ({ tags }) => {
   let word;
-  const query = { tags: { $all: tags } };
+  const query = tags.length === 0 ? {} : { tags: { $all: tags } };
   try {
     const count = await Word.find(query).count();
     const random = Math.floor(Math.random() * count);
@@ -62,9 +62,11 @@ const getPromptById = async (req, res, next) => {
 const generateRandomPrompt = async (req, res, next) => {
   const { gameMode, wordPack } = req.query;
 
+  const processedWordPack = wordPack === 'all' ? null : wordPack;
+
   let promptItems;
   let prompt;
-
+  // ERROR HANDLING – check if exist
   const promptRecipe = recipes[gameMode].request;
   const recipeKeys = Object.keys(promptRecipe);
 
@@ -72,8 +74,8 @@ const generateRandomPrompt = async (req, res, next) => {
     const promiseArray = [];
 
     for (let i = 0; i < recipeKeys.length; i += 1) {
-      const query = wordPack && promptRecipe[recipeKeys[i]].custamisable
-        ? [...promptRecipe[recipeKeys[i]].tags, wordPack]
+      const query = processedWordPack && promptRecipe[recipeKeys[i]].custamisable
+        ? [...promptRecipe[recipeKeys[i]].tags, processedWordPack]
         : promptRecipe[recipeKeys[i]].tags;
 
       const promptElement = getRandomWord({ tags: query })
